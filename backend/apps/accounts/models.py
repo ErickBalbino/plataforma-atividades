@@ -6,6 +6,7 @@ class User(AbstractUser):
         TEACHER = 'TEACHER', 'Professor'
         STUDENT = 'STUDENT', 'Aluno'
 
+    email = models.EmailField(unique=True)
     role = models.CharField(
         max_length=10,
         choices=Role.choices,
@@ -19,6 +20,9 @@ class User(AbstractUser):
         related_name='students'
     )
 
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
     def __str__(self):
-        return f"{self.username} ({self.get_role_display()})"
+        return f"{self.email} ({self.get_role_display()})"
 

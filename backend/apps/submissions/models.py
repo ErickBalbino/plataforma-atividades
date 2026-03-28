@@ -21,6 +21,7 @@ class Submission(models.Model):
         blank=True,
         validators=[MinValueValidator(0), MaxValueValidator(10)]
     )
+    feedback = models.TextField(null=True, blank=True)
     turned_in_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

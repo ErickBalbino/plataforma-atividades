@@ -1,9 +1,9 @@
-version: "3.8"
-
 services:
   db:
     image: postgres:15-alpine
     container_name: ced_db
+    env_file:
+      - .env
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-ced}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -23,6 +23,8 @@ services:
       - ./backend:/app
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
       - DEBUG=${DEBUG:-1}
       - SECRET_KEY=${SECRET_KEY:-django-insecure-test-key}
@@ -43,6 +45,8 @@ services:
       - /app/node_modules
     ports:
       - "5173:5173"
+    env_file:
+      - .env
     environment:
       - VITE_API_URL=${VITE_API_URL:-http://localhost:8000/api/v1}
     depends_on:
