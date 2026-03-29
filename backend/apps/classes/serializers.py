@@ -1,5 +1,20 @@
 from rest_framework import serializers
-from .models import ClassRoom
+from .models import ClassRoom, ClassRoomMembership
+from apps.accounts.serializers import UserSerializer
+
+class ClassRoomMembershipSerializer(serializers.ModelSerializer):
+    student = UserSerializer(read_only=True)
+
+    class Meta:
+        model = ClassRoomMembership
+        fields = ('id', 'student', 'joined_at')
+
+class ClassRoomReadSerializer(serializers.ModelSerializer):
+    teacher = UserSerializer(read_only=True)
+
+    class Meta:
+        model = ClassRoom
+        fields = ('id', 'name', 'code', 'teacher', 'created_at')
 
 class ClassRoomSerializer(serializers.ModelSerializer):
     class Meta:

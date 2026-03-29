@@ -13,11 +13,17 @@ class ActivityViewSet(viewsets.ModelViewSet):
             return Activity.objects.none()
         
         if user.is_staff or user.is_superuser:
-            return Activity.objects.all()
+            qs = Activity.objects.all()
+        elif user.role == 'TEACHER':
+            qs = Activity.objects.filter(teacher=user)
+        else:
+            qs = Activity.objects.filter(classroom__memberships__student=user)
             
-        if user.role == 'TEACHER':
-            return Activity.objects.filter(teacher=user)
-        return Activity.objects.filter(classroom__memberships__student=user)
+        classroom_id = self.request.query_params.get('classroom')
+        if classroom_id:
+            qs = qs.filter(classroom_id=classroom_id)
+            
+        return qs
 
     def get_serializer_class(self):
         if self.request.method in ['POST', 'PUT', 'PATCH']:

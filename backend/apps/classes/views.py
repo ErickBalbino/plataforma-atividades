@@ -2,12 +2,17 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import ClassRoom
-from .serializers import ClassRoomSerializer, ClassRoomJoinSerializer
+from .serializers import ClassRoomSerializer, ClassRoomJoinSerializer, ClassRoomReadSerializer
 from apps.accounts.permissions import IsTeacher, IsStudent
 from .permissions import IsClassRoomTeacher
 
 class ClassRoomViewSet(viewsets.ModelViewSet):
     serializer_class = ClassRoomSerializer
+
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return ClassRoomReadSerializer
+        return super().get_serializer_class()
 
     def get_queryset(self):
         user = self.request.user
@@ -39,3 +44,12 @@ class ClassRoomViewSet(viewsets.ModelViewSet):
             {"detail": "Entrada na sala de aula realizada com sucesso."},
             status=status.HTTP_201_CREATED
         )
+
+    @action(detail=True, methods=['get'], url_path='students')
+    def get_students(self, request, pk=None):
+        classroom = self.get_object()
+        memberships = classroom.memberships.select_related('student').all()
+        
+        from .serializers import ClassRoomMembershipSerializer
+        serializer = ClassRoomMembershipSerializer(memberships, many=True)
+        return Response(serializer.data)

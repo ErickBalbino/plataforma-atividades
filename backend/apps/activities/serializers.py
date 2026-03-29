@@ -17,6 +17,12 @@ class ActivityCreateSerializer(serializers.ModelSerializer):
         model = Activity
         fields = ('id', 'title', 'description', 'classroom', 'due_date')
         
+    def validate_classroom(self, value):
+        user = self.context['request'].user
+        if value.teacher != user:
+            raise serializers.ValidationError('Você só pode criar atividades para suas próprias salas de aula.')
+        return value
+        
     def validate_due_date(self, value):
         from django.utils import timezone
         if value < timezone.now():

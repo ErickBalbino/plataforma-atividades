@@ -9,7 +9,7 @@ from .serializers import (
     SubmissionUpdateSerializer, 
     SubmissionGradeSerializer
 )
-from .permissions import IsSubmissionStudent, IsSubmissionActivityTeacher
+from .permissions import IsSubmissionStudent, IsSubmissionActivityTeacher, IsSubmissionOwnerOrTeacher
 
 class SubmissionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
@@ -18,11 +18,17 @@ class SubmissionViewSet(viewsets.ModelViewSet):
             return Submission.objects.none()
 
         if user.is_staff or user.is_superuser:
-            return Submission.objects.all()
-
-        if user.role == 'TEACHER':
-            return Submission.objects.filter(activity__teacher=user)
-        return Submission.objects.filter(student=user)
+            qs = Submission.objects.all()
+        elif user.role == 'TEACHER':
+            qs = Submission.objects.filter(activity__teacher=user)
+        else:
+            qs = Submission.objects.filter(student=user)
+            
+        activity_id = self.request.query_params.get('activity')
+        if activity_id:
+            qs = qs.filter(activity_id=activity_id)
+            
+        return qs
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -37,30 +43,9 @@ class SubmissionViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == 'create':
             return [IsStudent()]
+        if self.action in ['update', 'partial_update', 'destroy']:
+            return [permissions.IsAuthenticated(), IsSubmissionOwnerOrTeacher()]
         return [permissions.IsAuthenticated()]
 
     def perform_create(self, serializer):
         serializer.save(student=self.request.user)
-
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        user = request.user
-        
-        if user.role == 'STUDENT':
-            if instance.student != user:
-                return Response(
-                    {'detail': 'Você só pode editar suas próprias respostas.'}, 
-                    status=status.HTTP_403_FORBIDDEN
-                )
-        elif user.role == 'TEACHER':
-            if instance.activity.teacher != user:
-                return Response(
-                    {'detail': 'Você só pode corrigir respostas de suas próprias atividades.'}, 
-                    status=status.HTTP_403_FORBIDDEN
-                )
-        
-        return super().update(request, *args, **kwargs)
-
-    def partial_update(self, request, *args, **kwargs):
-        kwargs['partial'] = True
-        return self.update(request, *args, **kwargs)
