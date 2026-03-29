@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from django.conf import settings
-from .serializers import UserSerializer, LoginSerializer
+from .serializers import UserSerializer, LoginSerializer, RegisterSerializer
 
 class AuthViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.AllowAny]
@@ -13,7 +13,18 @@ class AuthViewSet(viewsets.GenericViewSet):
     def get_serializer_class(self):
         if self.action == 'login':
             return LoginSerializer
+        if self.action == 'register':
+            return RegisterSerializer
         return UserSerializer
+
+    @action(detail=False, methods=['post'], url_path='register')
+    def register(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        
+        response_data = UserSerializer(user).data
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['post'], url_path='login')
     def login(self, request):

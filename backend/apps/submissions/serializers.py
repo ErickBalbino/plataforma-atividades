@@ -22,8 +22,8 @@ class SubmissionCreateSerializer(serializers.ModelSerializer):
         activity = data.get('activity')
         user = self.context['request'].user
 
-        if user.classroom != activity.classroom:
-            raise serializers.ValidationError('Você não pertence à turma desta atividade.')
+        if not activity.classroom.memberships.filter(student=user).exists():
+            raise serializers.ValidationError('Você não pertence à sala de aula desta atividade.')
 
         if Submission.objects.filter(activity=activity, student=user).exists():
             raise serializers.ValidationError('Você já enviou uma resposta para esta atividade.')

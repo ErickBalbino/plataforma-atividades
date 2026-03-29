@@ -7,7 +7,7 @@ from apps.activities.models import Activity
 from apps.submissions.models import Submission
 
 class Command(BaseCommand):
-    help = 'Popula o banco de dados com usuários, turmas e atividades iniciais para teste'
+    help = 'Popula o banco de dados com usuários, salas de aula e atividades iniciais'
 
     def handle(self, *args, **kwargs):
         self.stdout.write('Iniciando o Seed do Banco de Dados...')
@@ -17,11 +17,6 @@ class Command(BaseCommand):
         User.objects.all().delete()
         ClassRoom.objects.all().delete()
 
-        classroom_fullstack = ClassRoom.objects.create(
-            name='Turma 01'
-        )
-        self.stdout.write(self.style.SUCCESS(f'Turma criada: {classroom_fullstack.name}'))
-
         teacher = User.objects.create_user(
             username='professor',
             email='professor@email.com',
@@ -30,21 +25,30 @@ class Command(BaseCommand):
         )
         self.stdout.write(self.style.SUCCESS('Usuário Professor criado: professor@email.com | 123456'))
 
+        classroom_fullstack = ClassRoom.objects.create(
+            name='Sala de Aula 01',
+            teacher=teacher
+        )
+        self.stdout.write(self.style.SUCCESS(f'Sala de aula criada: {classroom_fullstack.name} ({classroom_fullstack.code})'))
+
         student1 = User.objects.create_user(
             username='aluno',
             email='aluno@email.com',
             password='123456',
-            role='STUDENT',
-            classroom=classroom_fullstack
+            role='STUDENT'
         )
         student2 = User.objects.create_user(
             username='maria',
             email='maria@email.com',
             password='123456',
-            role='STUDENT',
-            classroom=classroom_fullstack
+            role='STUDENT'
         )
         self.stdout.write(self.style.SUCCESS('Usuários Alunos criados: aluno@email.com | 123456'))
+
+        from apps.classes.models import ClassRoomMembership
+        ClassRoomMembership.objects.create(classroom=classroom_fullstack, student=student1)
+        ClassRoomMembership.objects.create(classroom=classroom_fullstack, student=student2)
+        self.stdout.write(self.style.SUCCESS('Alunos vinculados à sala de aula.'))
 
         activity_open = Activity.objects.create(
             teacher=teacher,
@@ -74,7 +78,7 @@ class Command(BaseCommand):
             student=student2,
             content='Modelagem lógica encaminhada em anexo (SQL e Diagrama).',
             grade=9.5,
-            feedback='Excelente mapeamento de N para N entre professor e turmas'
+            feedback='Excelente mapeamento e modelagem do sistema'
         )
         sub_graded.turned_in_at = timezone.now() - timedelta(days=3)
         sub_graded.save()

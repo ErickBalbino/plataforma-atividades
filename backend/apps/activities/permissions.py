@@ -6,4 +6,4 @@ class IsActivityTeacher(permissions.BasePermission):
 
 class IsActivityClassroom(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        return request.user.classroom == obj.classroom
+        return obj.classroom.memberships.filter(student=request.user).exists()

@@ -17,7 +17,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
             
         if user.role == 'TEACHER':
             return Activity.objects.filter(teacher=user)
-        return Activity.objects.filter(classroom=user.classroom)
+        return Activity.objects.filter(classroom__memberships__student=user)
 
     def get_serializer_class(self):
         if self.request.method in ['POST', 'PUT', 'PATCH']:

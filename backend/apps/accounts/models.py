@@ -12,13 +12,6 @@ class User(AbstractUser):
         choices=Role.choices,
         default=Role.STUDENT
     )
-    classroom = models.ForeignKey(
-        'classes.ClassRoom',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='students'
-    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
