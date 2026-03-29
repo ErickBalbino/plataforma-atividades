@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from datetime import timedelta
 from apps.accounts.models import User
-from apps.classes.models import Classroom
+from apps.classes.models import ClassRoom
 from apps.activities.models import Activity
 from apps.submissions.models import Submission
 
@@ -15,14 +15,15 @@ class Command(BaseCommand):
         Submission.objects.all().delete()
         Activity.objects.all().delete()
         User.objects.all().delete()
-        Classroom.objects.all().delete()
+        ClassRoom.objects.all().delete()
 
-        classroom_fullstack = Classroom.objects.create(
+        classroom_fullstack = ClassRoom.objects.create(
             name='Turma 01'
         )
         self.stdout.write(self.style.SUCCESS(f'Turma criada: {classroom_fullstack.name}'))
 
         teacher = User.objects.create_user(
+            username='professor',
             email='professor@email.com',
             password='123456',
             role='TEACHER'
@@ -30,12 +31,14 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Usuário Professor criado: professor@email.com | 123456'))
 
         student1 = User.objects.create_user(
+            username='aluno',
             email='aluno@email.com',
             password='123456',
             role='STUDENT',
             classroom=classroom_fullstack
         )
         student2 = User.objects.create_user(
+            username='maria',
             email='maria@email.com',
             password='123456',
             role='STUDENT',
