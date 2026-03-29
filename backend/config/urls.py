@@ -13,6 +13,7 @@ urlpatterns = [
     
     path('auth/', include('apps.accounts.urls')),
     path('atividades/', include('apps.activities.urls')),
+    path('turmas/', include('apps.classes.urls')),
     path('respostas/', include('apps.submissions.urls')),
     
     path('me/atividades', ActivityViewSet.as_view({'get': 'list'}), name='my-atividades'),

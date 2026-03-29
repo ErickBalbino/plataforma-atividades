@@ -1,7 +1,6 @@
 import {
   BookOutlined,
   CheckCircleOutlined,
-  DashboardOutlined,
   PlusCircleOutlined,
   SolutionOutlined,
 } from "@ant-design/icons";
@@ -28,7 +27,6 @@ export const Sidebar = () => {
   const navigate = useNavigate();
 
   const menuItems: MenuItem[] = [
-    getItem("Dashboard", "dashboard", <DashboardOutlined />),
     getItem("Atividades", "atividades", <BookOutlined />),
     ...(user?.role === "TEACHER"
       ? [
@@ -44,7 +42,7 @@ export const Sidebar = () => {
     navigate(`/${e.key}`);
   };
 
-  const selectedKey = location.pathname.split("/")[1] || "dashboard";
+  const selectedKey = location.pathname.split("/")[1] || "atividades";
 
   return (
     <Sider

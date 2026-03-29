@@ -2,21 +2,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, DatePicker, Form, Input, Select } from "antd";
 import dayjs from "dayjs";
 import { Controller, useForm } from "react-hook-form";
-import { useCreateActivity } from "../hooks/useActivities";
+import { useCreateActivity, useClassrooms } from "../hooks/useActivities";
 import { CreateActivityPayload, createActivitySchema } from "../schemas";
 
 const { TextArea } = Input;
 const { Option } = Select;
 
-// Mocked classrooms
-const MOCKED_CLASSROOMS = [
-  { id: 1, name: "Turma A (Manhã)" },
-  { id: 2, name: "Turma B (Tarde)" },
-  { id: 3, name: "Turma de Recuperação" },
-];
-
 export const CreateActivityForm = () => {
   const { mutate, isPending } = useCreateActivity();
+  const { data: classrooms, isLoading: classroomsLoading } = useClassrooms();
 
   const {
     control,
@@ -73,8 +67,10 @@ export const CreateActivityForm = () => {
                 placeholder="Selecione a turma"
                 size="large"
                 className="w-full"
+                loading={classroomsLoading}
+                disabled={classroomsLoading}
               >
-                {MOCKED_CLASSROOMS.map((c) => (
+                {classrooms?.map((c) => (
                   <Option key={c.id} value={c.id}>
                     {c.name}
                   </Option>

@@ -48,7 +48,7 @@ export const StudentSubmissionCard = ({
               color="success"
               className="m-0 px-3 py-1 font-semibold text-sm"
             >
-              Nota: {submission.grade?.toFixed(1)}
+              Nota: {Number(submission.grade).toFixed(1)}
             </Tag>
           ) : (
             <Tag color="processing" className="m-0">

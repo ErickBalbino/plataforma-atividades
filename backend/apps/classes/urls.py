@@ -1,10 +1,9 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-
-app_name = 'classes'
+from .views import ClassRoomViewSet
 
 router = DefaultRouter()
-# router.register(r'classes', ClassRoomViewSet, basename='classroom')
+router.register(r'', ClassRoomViewSet, basename='classrooms')
 
 urlpatterns = [
     path('', include(router.urls)),

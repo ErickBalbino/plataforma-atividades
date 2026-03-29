@@ -8,6 +8,11 @@ export const activityService = {
     return response.data;
   },
 
+  getClassRooms: async () => {
+    const response = await api.get<{ id: number; name: string }[]>("/turmas/");
+    return response.data;
+  },
+
   getActivityById: async (id: number) => {
     const response = await api.get<Activity>(`/atividades/${id}/`);
     return response.data;

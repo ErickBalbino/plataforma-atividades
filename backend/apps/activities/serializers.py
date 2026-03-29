@@ -22,3 +22,6 @@ class ActivityCreateSerializer(serializers.ModelSerializer):
         if value < timezone.now():
             raise serializers.ValidationError('A data de entrega não pode ser no passado.')
         return value
+
+    def to_representation(self, instance):
+        return ActivityReadSerializer(instance, context=self.context).data

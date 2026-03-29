@@ -5,6 +5,7 @@ import {
 } from "@ant-design/icons";
 import { Card, Tag, Typography } from "antd";
 import { Link } from "react-router-dom";
+import dayjs from "dayjs";
 import { useUser } from "../../auth/hooks/useAuth";
 import { Activity } from "../types";
 
@@ -19,16 +20,10 @@ export const ActivityCard = ({ activity }: ActivityCardProps) => {
   const isTeacher = user?.role === "TEACHER";
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("pt-BR", {
-      day: "2-digit",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
+    return dayjs(dateString).format("DD/MM/YYYY HH:mm");
   };
 
-  const isLate = new Date(activity.due_date) < new Date();
+  const isLate = dayjs(activity.due_date).isBefore(dayjs());
 
   return (
     <Link to={`/atividades/${activity.id}`}>
@@ -68,7 +63,7 @@ export const ActivityCard = ({ activity }: ActivityCardProps) => {
               <>
                 <UserOutlined className="text-gray-400" />
                 <Text type="secondary" className="text-sm">
-                  Prof. {activity.teacher.email.split("@")[0]}
+                  Prof. {activity.teacher?.email?.split("@")[0] || "Desconhecido"}
                 </Text>
               </>
             )}

@@ -1,12 +1,12 @@
 import { CheckCircleFilled } from "@ant-design/icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Form, Input, InputNumber, Tag } from "antd";
+import dayjs from "dayjs";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useGradeSubmission } from "../hooks/useSubmissions";
 import { GradeSubmissionPayload, gradeSubmissionSchema } from "../schemas";
 import { Submission } from "../types";
-import dayjs from "dayjs";
 
 interface GradeSubmissionCardProps {
   submission: Submission;
@@ -49,7 +49,7 @@ export const GradeSubmissionCard = ({
   };
 
   const formattedDate = dayjs(submission.turned_in_at).format(
-    "DD/MM/YYYY HH:mm"
+    "DD/MM/YYYY HH:mm",
   );
 
   return (
@@ -74,14 +74,16 @@ export const GradeSubmissionCard = ({
               color="success"
               className="m-0 px-3 py-1 font-semibold"
             >
-              Corrigido: {submission.grade?.toFixed(1)}
+              Corrigido: {Number(submission.grade).toFixed(1)}
             </Tag>
           ) : (
             <Tag color="warning" className="m-0">
               Pendente
             </Tag>
           )}
-          <span className="text-xs text-gray-400">Enviado em {formattedDate}</span>
+          <span className="text-xs text-gray-400">
+            Enviado em {formattedDate}
+          </span>
         </div>
       </div>
 
@@ -91,10 +93,14 @@ export const GradeSubmissionCard = ({
         </p>
       </div>
 
-      <Form layout="vertical" onFinish={handleSubmit(onSubmit)} className="mt-4">
+      <Form
+        layout="vertical"
+        onFinish={handleSubmit(onSubmit)}
+        className="mt-4"
+      >
         <div className="flex gap-4 items-start">
           <Form.Item
-            label="Nota (0-10)"
+            label="Nota"
             validateStatus={errors.grade ? "error" : ""}
             help={errors.grade?.message}
             className="w-32 mb-0"

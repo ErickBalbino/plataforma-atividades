@@ -2,6 +2,7 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from django.conf import settings
 from .serializers import UserSerializer, LoginSerializer
 
@@ -32,6 +33,44 @@ class AuthViewSet(viewsets.GenericViewSet):
 
         response = Response(response_data, status=status.HTTP_200_OK)
 
+        secure_cookie = settings.SIMPLE_JWT.get('AUTH_COOKIE_SECURE', False)
+        
+        response.set_cookie(
+            key=settings.SIMPLE_JWT.get('AUTH_COOKIE', 'access_token'),
+            value=access_token,
+            httponly=True,
+            secure=secure_cookie,
+            samesite='Lax',
+            path='/'
+        )
+        
+        response.set_cookie(
+            key=settings.SIMPLE_JWT.get('AUTH_REFRESH_COOKIE', 'refresh_token'),
+            value=refresh_token,
+            httponly=True,
+            secure=secure_cookie,
+            samesite='Lax',
+            path='/'
+        )
+        
+        return response
+
+    @action(detail=False, methods=['post'], url_path='refresh')
+    def refresh(self, request):
+        refresh_cookie_name = settings.SIMPLE_JWT.get('AUTH_REFRESH_COOKIE', 'refresh_token')
+        raw_refresh_token = request.COOKIES.get(refresh_cookie_name)
+        
+        if not raw_refresh_token:
+            return Response({'detail': 'Refresh token ausente.'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        try:
+            refresh = RefreshToken(raw_refresh_token)
+            access_token = str(refresh.access_token)
+        except (InvalidToken, TokenError):
+            return Response({'detail': 'Refresh token inválido ou expirado.'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        response = Response({'access': access_token}, status=status.HTTP_200_OK)
+        
         response.set_cookie(
             key=settings.SIMPLE_JWT.get('AUTH_COOKIE', 'access_token'),
             value=access_token,
@@ -40,13 +79,13 @@ class AuthViewSet(viewsets.GenericViewSet):
             samesite='Lax',
             path='/'
         )
-        
         return response
 
     @action(detail=False, methods=['post'], url_path='logout', permission_classes=[permissions.IsAuthenticated])
     def logout(self, request):
         response = Response({'detail': 'Logout realizado com sucesso.'}, status=status.HTTP_200_OK)
         response.delete_cookie(settings.SIMPLE_JWT.get('AUTH_COOKIE', 'access_token'))
+        response.delete_cookie(settings.SIMPLE_JWT.get('AUTH_REFRESH_COOKIE', 'refresh_token'))
         return response
 
     @action(detail=False, methods=['get'], url_path='me', permission_classes=[permissions.IsAuthenticated])

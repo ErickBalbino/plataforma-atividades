@@ -1,9 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
+import { CreateActivityPayload } from "../schemas";
 import { activityService } from "../services/activityService";
 import { Activity } from "../types";
-import { CreateActivityPayload } from "../schemas";
 
 export const useActivities = () => {
   return useQuery<Activity[]>({
@@ -16,6 +16,14 @@ export const useActivities = () => {
           new Date(a.due_date).getTime() - new Date(b.due_date).getTime(),
       );
     },
+  });
+};
+
+export const useClassrooms = () => {
+  return useQuery({
+    queryKey: ["classrooms"],
+    queryFn: activityService.getClassRooms,
+    staleTime: 1000 * 60 * 60 * 24,
   });
 };
 
@@ -41,7 +49,9 @@ export const useCreateActivity = () => {
       navigate("/atividades");
     },
     onError: () => {
-      message.error("Erro ao criar atividade. Verifique os dados e tente novamente.");
+      message.error(
+        "Erro ao criar atividade. Verifique os dados e tente novamente.",
+      );
     },
   });
 };
