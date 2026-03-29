@@ -11,10 +11,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/health/', health_check, name='health_check'),
     
-    path('auth/login/', include('apps.accounts.urls')),
+    path('auth/', include('apps.accounts.urls')),
     path('atividades/', include('apps.activities.urls')),
     path('respostas/', include('apps.submissions.urls')),
     
-    path('me/atividades', ActivityViewSet.as_view({'get': 'my_activities'}), name='my-atividades'),
-    path('me/respostas', SubmissionViewSet.as_view({'get': 'my_submissions'}), name='my-respostas'),
+    path('me/atividades', ActivityViewSet.as_view({'get': 'list'}), name='my-atividades'),
+    path('me/respostas', SubmissionViewSet.as_view({'get': 'list'}), name='my-respostas'),
 ]

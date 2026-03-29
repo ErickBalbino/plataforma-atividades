@@ -41,21 +41,25 @@ class SubmissionViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(student=self.request.user)
 
-    @action(detail=False, methods=['get'], url_path='me', permission_classes=[IsStudent])
-    def my_submissions(self, request):
-        queryset = Submission.objects.filter(student=request.user)
-        serializer = SubmissionReadSerializer(queryset, many=True)
-        return Response(serializer.data)
-
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         user = request.user
         
         if user.role == 'STUDENT':
             if instance.student != user:
-                return Response({'detail': 'Você não tem permissão para editar esta resposta.'}, status=status.HTTP_403_FORBIDDEN)
+                return Response(
+                    {'detail': 'Você só pode editar suas próprias respostas.'}, 
+                    status=status.HTTP_403_FORBIDDEN
+                )
         elif user.role == 'TEACHER':
             if instance.activity.teacher != user:
-                return Response({'detail': 'Você não tem permissão para corrigir esta resposta.'}, status=status.HTTP_403_FORBIDDEN)
+                return Response(
+                    {'detail': 'Você só pode corrigir respostas de suas próprias atividades.'}, 
+                    status=status.HTTP_403_FORBIDDEN
+                )
         
         return super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)

@@ -34,16 +34,6 @@ class ActivityViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(teacher=self.request.user)
 
-    @action(detail=False, methods=['get'], url_path='me')
-    def my_activities(self, request):
-        if request.user.role == 'TEACHER':
-            queryset = Activity.objects.filter(teacher=request.user)
-        else:
-            queryset = Activity.objects.filter(classroom=request.user.classroom)
-        
-        serializer = ActivityReadSerializer(queryset, many=True)
-        return Response(serializer.data)
-
     @action(detail=True, methods=['get'], url_path='respostas', permission_classes=[IsTeacher, IsActivityTeacher])
     def get_submissions(self, request, pk=None):
         activity = self.get_object()
