@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { message } from "antd";
+import { ApiErrorResponse } from "../../core/types/api";
 import { submissionService } from "../services/submissionService";
 import { Submission } from "../types";
 
@@ -31,8 +32,9 @@ export const useCreateSubmission = () => {
       queryClient.invalidateQueries({ queryKey: ["submissions"] });
       message.success("Resposta enviada com sucesso!");
     },
-    onError: () => {
-      message.error("Erro ao enviar resposta. Verifique os dados e tente novamente.");
+    onError: (e) => {
+      const error = e as unknown as ApiErrorResponse;
+      message.error(error.message || "Erro ao enviar resposta.");
     },
   });
 };
@@ -47,8 +49,9 @@ export const useUpdateSubmission = () => {
       queryClient.invalidateQueries({ queryKey: ["submissions"] });
       message.success("Resposta atualizada com sucesso!");
     },
-    onError: () => {
-      message.error("Erro ao atualizar resposta. Verifique o prazo da atividade.");
+    onError: (e) => {
+      const error = e as unknown as ApiErrorResponse;
+      message.error(error.message || "Erro ao atualizar resposta.");
     },
   });
 };
@@ -70,8 +73,9 @@ export const useGradeSubmission = () => {
       queryClient.invalidateQueries({ queryKey: ["submissions"] });
       message.success("Nota e feedback salvos com sucesso!");
     },
-    onError: () => {
-      message.error("Erro ao salvar correção. Tente novamente.");
+    onError: (e) => {
+      const error = e as unknown as ApiErrorResponse;
+      message.error(error.message || "Erro ao salvar correção.");
     },
   });
 };

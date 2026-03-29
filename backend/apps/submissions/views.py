@@ -28,8 +28,9 @@ class SubmissionViewSet(viewsets.ModelViewSet):
         if self.request.method == 'POST':
             return SubmissionCreateSerializer
         if self.request.method in ['PUT', 'PATCH']:
-            if self.request.user.role == 'TEACHER':
-                return SubmissionGradeSerializer
+            if hasattr(self.request, 'user') and self.request.user.is_authenticated:
+                if getattr(self.request.user, 'role', None) == 'TEACHER':
+                    return SubmissionGradeSerializer
             return SubmissionUpdateSerializer
         return SubmissionReadSerializer
 

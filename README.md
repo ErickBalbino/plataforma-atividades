@@ -100,7 +100,7 @@ A abstração da Rest API foi documentada internamente, utilizando nomenclatura 
 
 ---
 
-## 💡 Decisões Técnicas de Destaque
+## 💡 Decisões Técnicas
 
 - **Autenticação via Cookies `HttpOnly`**: Optamos por não utilizar o `localStorage` do browser em prol de uma maior segurança arquitetural contra roubo de tokens maliciosos, armazenando o JWT e o Refresh na camada segura gerida pelo navegador do lado do Django.
 - **TanStack Query & Invalidação de Cache Silenciosa**: Interceptar requisições lentas via Loading Spinners tornou a performance do projeto espetacular. Com a invalidação dos caches, ações contínuas (como as "Correções") geram um sentimento de sistema leve — avaliou um Aluno, ele flui automaticamente para a próxima card via React.
@@ -130,3 +130,32 @@ O ambiente foi Dockerizado nativamente, isolando você da necessidade de bibliot
 4. Acesse:
    - Frontend web ativo: `http://localhost:5173`
    - Backend gerencial REST: `http://localhost:8000/`
+
+---
+
+## 🧪 Credenciais e Dados de Teste (Seed)
+
+Para facilitar a avaliação do sistema sem a necessidade de cadastros manuais, foi construído um comando que popula o banco com um cenário inicial (Usuários, Turmas, Atividades e Submissões):
+
+Execute na pasta raiz:
+
+```bash
+docker compose exec backend python manage.py seed
+```
+
+Após o sucesso, faça login com os usuários abaixo:
+
+### 🎓 Perfil Professor
+
+Pode criar atividades na "Turma Fullstack 101" e corrigir envios:
+
+- **E-mail:** `professor@email.com`
+- **Senha:** `123456`
+
+### 📚 Perfil Aluno (1 e 2)
+
+Podem acessar as tarefas da sua turma e submeter resoluções:
+
+- **E-mail 1:** `aluno@email.com`
+- **E-mail 2:** `maria@email.com`
+- **Senha:** `123456` (para ambos)

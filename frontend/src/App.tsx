@@ -8,6 +8,7 @@ import { GradingPage } from "./pages/submissions/GradingPage";
 import { MySubmissionsPage } from "./pages/submissions/MySubmissionsPage";
 import { ProtectedRoute } from "./shared/components/auth/ProtectedRoute";
 import { MainLayout } from "./shared/components/layout/MainLayout";
+import { RoleRoute } from "./shared/components/auth/RoleRoute";
 
 function App() {
   return (
@@ -30,9 +31,30 @@ function App() {
           />
           <Route path="atividades" element={<ActivitiesPage />} />
           <Route path="atividades/:id" element={<ActivityDetailsPage />} />
-          <Route path="nova-atividade" element={<CreateActivityPage />} />
-          <Route path="correcoes" element={<GradingPage />} />
-          <Route path="minhas-respostas" element={<MySubmissionsPage />} />
+          <Route 
+            path="nova-atividade" 
+            element={
+              <RoleRoute allowedRoles={["TEACHER"]}>
+                <CreateActivityPage />
+              </RoleRoute>
+            } 
+          />
+          <Route 
+            path="correcoes" 
+            element={
+              <RoleRoute allowedRoles={["TEACHER"]}>
+                <GradingPage />
+              </RoleRoute>
+            } 
+          />
+          <Route 
+            path="minhas-respostas" 
+            element={
+              <RoleRoute allowedRoles={["STUDENT"]}>
+                <MySubmissionsPage />
+              </RoleRoute>
+            } 
+          />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />
