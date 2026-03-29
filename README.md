@@ -147,7 +147,7 @@ Após o sucesso, faça login com os usuários abaixo:
 
 ### 🎓 Perfil Professor
 
-Pode criar atividades na "Turma Fullstack 101" e corrigir envios:
+Pode criar atividades na "Turma 01" e corrigir envios:
 
 - **E-mail:** `professor@email.com`
 - **Senha:** `123456`
