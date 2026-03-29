@@ -1,12 +1,12 @@
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, Alert } from 'antd';
 import { Controller, useForm } from 'react-hook-form';
 import { loginSchema, LoginCredentials } from '../types';
 import { useLogin } from '../hooks/useAuth';
 
 export const LoginForm = () => {
-  const { mutate, isPending } = useLogin();
+  const { mutate, isPending, isError } = useLogin();
 
   const {
     control,
@@ -15,7 +15,7 @@ export const LoginForm = () => {
   } = useForm<LoginCredentials>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: '',
+      email: '',
       password: '',
     },
   });
@@ -26,19 +26,27 @@ export const LoginForm = () => {
 
   return (
     <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+      {isError && (
+        <Alert
+          message="E-mail ou senha incorretos."
+          type="error"
+          showIcon
+          className="mb-6"
+        />
+      )}
       <Form.Item
-        label="Usuário"
-        validateStatus={errors.username ? 'error' : ''}
-        help={errors.username?.message}
+        label="E-mail"
+        validateStatus={errors.email ? 'error' : ''}
+        help={errors.email?.message}
       >
         <Controller
-          name="username"
+          name="email"
           control={control}
           render={({ field }) => (
             <Input
               {...field}
-              prefix={<UserOutlined className="text-gray-400" />}
-              placeholder="Seu usuário"
+              prefix={<MailOutlined className="text-gray-400" />}
+              placeholder="seu@email.com"
               size="large"
             />
           )}

@@ -7,16 +7,16 @@ export const authService = {
       user: AuthUser;
       access: string;
       refresh: string;
-    }>("/accounts/login/", credentials);
+    }>("/auth/login/", credentials);
     return response.data;
   },
 
   getCurrentUser: async () => {
-    const response = await api.get<AuthUser>("/accounts/me/");
+    const response = await api.get<AuthUser>("/auth/me/");
     return response.data;
   },
 
   logout: async () => {
-    return Promise.resolve();
+    await api.post("/auth/logout/");
   },
 };

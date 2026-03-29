@@ -22,10 +22,17 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         locale={ptBR}
         theme={{
           token: {
-            colorPrimary: "#1677ff",
-            borderRadius: 6,
+            colorPrimary: "#1890ff",
+            borderRadius: 8,
+            colorBgLayout: "#f5f5f5",
             fontFamily:
               'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial',
+          },
+          components: {
+            Layout: {
+              headerBg: "#ffffff",
+              siderBg: "#ffffff",
+            },
           },
         }}
       >
