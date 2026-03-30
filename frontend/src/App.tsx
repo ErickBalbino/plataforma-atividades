@@ -3,6 +3,9 @@ import { ActivitiesPage } from "./pages/activities/ActivitiesPage";
 import { ActivityDetailsPage } from "./pages/activities/ActivityDetailsPage";
 import { CreateActivityPage } from "./pages/activities/CreateActivityPage";
 import { LoginPage } from "./pages/auth/LoginPage";
+import { RegisterPage } from "./pages/auth/RegisterPage";
+import { ClassRoomsPage } from "./pages/classes/ClassRoomsPage";
+import { ClassRoomDetailsPage } from "./pages/classes/ClassRoomDetailsPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { GradingPage } from "./pages/submissions/GradingPage";
 import { MySubmissionsPage } from "./pages/submissions/MySubmissionsPage";
@@ -15,6 +18,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/cadastro" element={<RegisterPage />} />
 
         <Route
           path="/"
@@ -24,7 +28,10 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Navigate to="/atividades" replace />} />
+          <Route index element={<Navigate to="/salas" replace />} />
+          <Route path="salas" element={<ClassRoomsPage />} />
+          <Route path="salas/:id" element={<ClassRoomDetailsPage />} />
+          
           <Route path="atividades" element={<ActivitiesPage />} />
           <Route path="atividades/:id" element={<ActivityDetailsPage />} />
           <Route

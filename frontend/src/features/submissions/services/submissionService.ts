@@ -1,9 +1,12 @@
 import api from "../../../shared/api/apiClient";
 import { Submission } from "../types";
+import { PaginatedResponse } from "../../../features/core/types/api";
 
 export const submissionService = {
-  getMySubmissions: async () => {
-    const response = await api.get<Submission[]>("/me/respostas");
+  getMySubmissions: async (params?: { page?: number; search?: string }) => {
+    const response = await api.get<PaginatedResponse<Submission>>("/me/respostas", {
+      params,
+    });
     return response.data;
   },
 
@@ -22,7 +25,11 @@ export const submissionService = {
     return response.data;
   },
 
-  gradeSubmission: async (submissionId: number, grade: number, feedback?: string) => {
+  gradeSubmission: async (
+    submissionId: number,
+    grade: number,
+    feedback?: string,
+  ) => {
     const response = await api.patch<Submission>(`/respostas/${submissionId}/`, {
       grade,
       feedback: feedback || null,
@@ -30,4 +37,3 @@ export const submissionService = {
     return response.data;
   },
 };
-

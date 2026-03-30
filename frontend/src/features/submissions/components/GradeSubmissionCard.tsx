@@ -61,7 +61,7 @@ export const GradeSubmissionCard = ({
       <div className="flex justify-between items-start gap-4">
         <div>
           <h3 className="font-bold text-gray-800 text-lg">
-            {submission.student.email}
+            {submission.student.name || submission.student.username}
           </h3>
           <p className="text-gray-500 text-sm">
             Atividade: {submission.activity.title}

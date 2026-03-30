@@ -33,7 +33,7 @@ export const StudentSubmissionCard = ({
             to={`/atividades/${submission.activity.id}`}
             className="group flex flex-col items-start"
           >
-            <h3 className="font-bold text-gray-800 text-lg group-hover:text-blue-600 transition-colors">
+            <h3 className="font-bold text-gray-800 text-lg group-hover:text-green-700 transition-colors">
               {submission.activity.title}
             </h3>
             <span className="text-sm text-gray-500 flex items-center gap-1 mt-1">
@@ -71,8 +71,8 @@ export const StudentSubmissionCard = ({
       </div>
 
       {isGraded && submission.feedback && (
-        <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 mt-2 flex flex-col gap-2">
-          <h4 className="text-xs font-semibold text-blue-600 uppercase tracking-wider">
+        <div className="bg-green-50/50 p-4 rounded-xl border border-green-100 mt-2 flex flex-col gap-2">
+          <h4 className="text-xs font-semibold text-green-700 uppercase tracking-wider">
             Comentário do Professor:
           </h4>
           <p className="text-gray-800 whitespace-pre-wrap italic">
@@ -85,7 +85,7 @@ export const StudentSubmissionCard = ({
         <div className="mt-2 text-right">
           <Link
             to={`/atividades/${submission.activity.id}`}
-            className="text-sm font-medium text-blue-600 hover:text-blue-700"
+            className="text-sm font-medium text-green-600 hover:text-green-700"
           >
             Ainda dá tempo de editar sua resposta{" "}
             <CaretRightOutlined style={{ fontSize: "12px" }} />

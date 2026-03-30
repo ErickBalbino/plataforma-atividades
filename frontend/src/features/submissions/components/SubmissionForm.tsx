@@ -30,6 +30,8 @@ export const SubmissionForm = ({
 
   const isPending = isCreating || isUpdating;
   const isLate = new Date(dueDate) < new Date();
+  const isGraded = !!submission && submission.grade !== null;
+
 
   const {
     control,
@@ -61,24 +63,42 @@ export const SubmissionForm = ({
     return <div className="text-gray-400">Verificando envio anterior...</div>;
   }
 
-  if (isLate) {
+  if (isLate || isGraded) {
     if (submission) {
       return (
         <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
-          <h4 className="font-semibold text-gray-700 mb-2">Sua Resposta:</h4>
+          <div className="flex justify-between items-center mb-4">
+            <h4 className="font-semibold text-gray-700 m-0">Sua Resposta:</h4>
+            {isGraded && (
+              <span className="text-xs font-bold text-green-700 bg-green-50 px-2 py-1 rounded">
+                RESPOSTA AVALIADA
+              </span>
+            )}
+          </div>
           <p className="text-gray-600 whitespace-pre-wrap">
             {submission.content}
           </p>
           {submission.grade !== null && (
             <div className="mt-4 pt-4 border-t border-gray-200">
-              <span className="font-semibold text-gray-800">
-                Nota: {submission.grade}
+              <span className="font-bold text-gray-800 text-lg">
+                Nota: {Number(submission.grade).toFixed(1)}
               </span>
               {submission.feedback && (
-                <p className="text-sm text-gray-600 mt-1">
-                  Feedback: {submission.feedback}
-                </p>
+                <div className="bg-blue-50/50 p-4 rounded-lg mt-3 border border-blue-100">
+                  <span className="text-xs font-bold text-blue-700 uppercase block mb-1">
+                    Feedback do professor:
+                  </span>
+                  <p className="text-sm text-gray-700 italic m-0">
+                    "{submission.feedback}"
+                  </p>
+                </div>
               )}
+            </div>
+          )}
+          {isGraded && !isLate && (
+            <div className="mt-4 text-xs text-amber-600 font-medium">
+              * Esta resposta não pode mais ser editada pois já recebeu uma
+              avaliação.
             </div>
           )}
         </div>
@@ -86,7 +106,9 @@ export const SubmissionForm = ({
     }
     return (
       <div className="bg-red-50 text-red-600 p-4 rounded-lg">
-        O prazo para envio desta atividade já se encerrou
+        {isLate
+          ? "O prazo para envio desta atividade já se encerrou"
+          : "Esta atividade já foi avaliada e não permite edição"}
       </div>
     );
   }

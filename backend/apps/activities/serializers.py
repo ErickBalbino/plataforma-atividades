@@ -6,11 +6,12 @@ from apps.accounts.serializers import UserSerializer
 class ActivityReadSerializer(serializers.ModelSerializer):
     classroom = ClassRoomSerializer(read_only=True)
     teacher = UserSerializer(read_only=True)
+    is_submitted = serializers.BooleanField(read_only=True, default=False)
 
     class Meta:
         model = Activity
-        fields = ('id', 'title', 'description', 'classroom', 'teacher', 'due_date', 'created_at', 'updated_at')
-        read_only_fields = ('id', 'created_at', 'updated_at')
+        fields = ('id', 'title', 'description', 'classroom', 'teacher', 'due_date', 'created_at', 'updated_at', 'is_submitted')
+        read_only_fields = ('id', 'created_at', 'updated_at', 'is_submitted')
 
 class ActivityCreateSerializer(serializers.ModelSerializer):
     class Meta:

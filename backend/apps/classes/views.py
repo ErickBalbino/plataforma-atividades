@@ -20,8 +20,17 @@ class ClassRoomViewSet(viewsets.ModelViewSet):
             return ClassRoom.objects.none()
             
         if user.role == 'TEACHER':
-            return ClassRoom.objects.filter(teacher=user)
-        return ClassRoom.objects.filter(memberships__student=user)
+            qs = ClassRoom.objects.filter(teacher=user)
+        else:
+            qs = ClassRoom.objects.filter(memberships__student=user)
+            
+        if self.action == 'list':
+            from django.db.models import Q
+            search = self.request.query_params.get('search')
+            if search:
+                qs = qs.filter(Q(name__icontains=search) | Q(code__icontains=search))
+            
+        return qs.order_by('-created_at')
 
     def get_permissions(self):
         if self.action == 'create':
@@ -35,7 +44,7 @@ class ClassRoomViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(teacher=self.request.user)
 
-    @action(detail=False, methods=['post'], url_path='join')
+    @action(detail=False, methods=['post'], url_path='entrar')
     def join(self, request):
         serializer = ClassRoomJoinSerializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
@@ -45,11 +54,28 @@ class ClassRoomViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED
         )
 
-    @action(detail=True, methods=['get'], url_path='students')
+    @action(detail=True, methods=['get'], url_path='alunos')
     def get_students(self, request, pk=None):
         classroom = self.get_object()
+        from django.db.models import Q
+        search = request.query_params.get('search')
+        
         memberships = classroom.memberships.select_related('student').all()
         
+        if search:
+            memberships = memberships.filter(
+                Q(student__name__icontains=search) | Q(student__email__icontains=search)
+            )
+            
+        memberships = memberships.order_by('student__name', 'student__username')
+
+        
+        page = self.paginate_queryset(memberships)
+        if page is not None:
+            from .serializers import ClassRoomMembershipSerializer
+            serializer = ClassRoomMembershipSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
         from .serializers import ClassRoomMembershipSerializer
         serializer = ClassRoomMembershipSerializer(memberships, many=True)
         return Response(serializer.data)

@@ -1,9 +1,9 @@
-import { LockOutlined, MailOutlined } from '@ant-design/icons';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Form, Input, Alert } from 'antd';
-import { Controller, useForm } from 'react-hook-form';
-import { loginSchema, LoginCredentials } from '../types';
-import { useLogin } from '../hooks/useAuth';
+import { LockOutlined, MailOutlined } from "@ant-design/icons";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Alert, Button, Form, Input } from "antd";
+import { Controller, useForm } from "react-hook-form";
+import { useLogin } from "../hooks/useAuth";
+import { LoginCredentials, loginSchema } from "../types";
 
 export const LoginForm = () => {
   const { mutate, isPending, isError } = useLogin();
@@ -15,8 +15,8 @@ export const LoginForm = () => {
   } = useForm<LoginCredentials>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
   });
 
@@ -36,7 +36,7 @@ export const LoginForm = () => {
       )}
       <Form.Item
         label="E-mail"
-        validateStatus={errors.email ? 'error' : ''}
+        validateStatus={errors.email ? "error" : ""}
         help={errors.email?.message}
       >
         <Controller
@@ -45,9 +45,12 @@ export const LoginForm = () => {
           render={({ field }) => (
             <Input
               {...field}
-              prefix={<MailOutlined className="text-gray-400" />}
+              prefix={
+                <MailOutlined className="text-gray-400 translate-y-[1px]" />
+              }
               placeholder="seu@email.com"
               size="large"
+              className="rounded-lg"
             />
           )}
         />
@@ -55,7 +58,7 @@ export const LoginForm = () => {
 
       <Form.Item
         label="Senha"
-        validateStatus={errors.password ? 'error' : ''}
+        validateStatus={errors.password ? "error" : ""}
         help={errors.password?.message}
       >
         <Controller
@@ -67,6 +70,7 @@ export const LoginForm = () => {
               prefix={<LockOutlined className="text-gray-400" />}
               placeholder="Sua senha"
               size="large"
+              className="rounded-lg"
             />
           )}
         />

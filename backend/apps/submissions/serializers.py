@@ -40,6 +40,10 @@ class SubmissionUpdateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         instance = self.instance
+        
+        if instance.grade is not None:
+            raise serializers.ValidationError('Não é possível alterar a resposta após ela ter sido avaliada pelo professor.')
+            
         if instance.activity.due_date < timezone.now():
             raise serializers.ValidationError('Não é possível alterar a resposta após o prazo de entrega.')
         return data

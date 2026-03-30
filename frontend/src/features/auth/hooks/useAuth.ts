@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../services/authService";
-import { LoginCredentials } from "../types";
+import { LoginCredentials, RegisterCredentials } from "../types";
 
 export const useLogin = () => {
   const queryClient = useQueryClient();
@@ -18,6 +18,35 @@ export const useLogin = () => {
     },
     onError: () => {
       message.error("Erro ao realizar login. Verifique suas credenciais.");
+    },
+  });
+};
+
+export const useRegister = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: (credentials: RegisterCredentials) =>
+      authService.register(credentials),
+    onSuccess: async (_user, credentials) => {
+      try {
+        const loginResponse = await authService.login({
+          email: credentials.email,
+          password: credentials.password,
+        });
+        queryClient.setQueryData(["user"], loginResponse.user);
+        message.success("Conta criada com sucesso!");
+        navigate("/");
+      } catch {
+        message.info("Cadastro realizado! Faça login para continuar.");
+        navigate("/login");
+      }
+    },
+    onError: (error: any) => {
+      if (!error?.errors) {
+        message.error("Erro ao realizar cadastro. Verifique os dados.");
+      }
     },
   });
 };

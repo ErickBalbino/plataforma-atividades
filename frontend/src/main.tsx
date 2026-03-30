@@ -22,9 +22,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         locale={ptBR}
         theme={{
           token: {
-            colorPrimary: "#1890ff",
+            colorPrimary: "#137333",
             borderRadius: 8,
-            colorBgLayout: "#f5f5f5",
+            colorBgLayout: "#f8f9fa",
+            colorText: "#202124",
+            colorTextSecondary: "#5f6368",
+            colorBorder: "#9ca3af",
+            colorPrimaryBorder: "#137333",
+
+
             fontFamily:
               'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial',
           },

@@ -16,7 +16,7 @@ export const CreateActivityPage = () => {
             Nova Atividade
           </Title>
           <Text type="secondary" className="text-sm">
-            Crie uma nova atividade e atribua a uma turma específica.
+            Crie uma nova atividade para uma sala de aula.
           </Text>
         </div>
       </div>

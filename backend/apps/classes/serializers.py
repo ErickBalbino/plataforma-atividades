@@ -11,10 +11,18 @@ class ClassRoomMembershipSerializer(serializers.ModelSerializer):
 
 class ClassRoomReadSerializer(serializers.ModelSerializer):
     teacher = UserSerializer(read_only=True)
+    students_count = serializers.SerializerMethodField()
+    activities_count = serializers.SerializerMethodField()
 
     class Meta:
         model = ClassRoom
-        fields = ('id', 'name', 'code', 'teacher', 'created_at')
+        fields = ('id', 'name', 'code', 'teacher', 'created_at', 'students_count', 'activities_count')
+
+    def get_students_count(self, obj):
+        return obj.memberships.count()
+        
+    def get_activities_count(self, obj):
+        return obj.activities.count()
 
 class ClassRoomSerializer(serializers.ModelSerializer):
     class Meta:

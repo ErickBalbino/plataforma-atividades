@@ -9,8 +9,8 @@ export const createActivitySchema = z.object({
     .string()
     .min(10, "A descrição deve ter pelo menos 10 caracteres"),
   classroom: z.number({
-    required_error: "Selecione uma turma",
-    invalid_type_error: "Turma inválida",
+    required_error: "Selecione uma sala de aula",
+    invalid_type_error: "Sala de aula inválida",
   }),
   due_date: z
     .date({

@@ -1,21 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { message } from "antd";
-import { ApiErrorResponse } from "../../core/types/api";
+import { ApiErrorResponse, PaginatedResponse } from "../../core/types/api";
 import { submissionService } from "../services/submissionService";
 import { Submission } from "../types";
 
-export const useSubmissions = () => {
-  return useQuery<Submission[]>({
-    queryKey: ["submissions"],
-    queryFn: submissionService.getMySubmissions,
+export const useSubmissions = (params?: { page?: number; search?: string }) => {
+  return useQuery<PaginatedResponse<Submission>>({
+    queryKey: ["submissions", params],
+    queryFn: () => submissionService.getMySubmissions(params),
     staleTime: 1000 * 60 * 5,
   });
 };
 
 export const useSubmissionForActivity = (activityId: number) => {
-  const { data: submissions, isLoading } = useSubmissions();
+  const { data: response, isLoading } = useSubmissions();
   
-  const submission = submissions?.find(
+  const submission = response?.results?.find(
     (sub) => sub.activity.id === activityId
   );
 

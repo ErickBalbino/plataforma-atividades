@@ -1,15 +1,20 @@
+import { PaginatedResponse } from "../../../features/core/types/api";
 import api from "../../../shared/api/apiClient";
 import { CreateActivityPayload } from "../schemas";
 import { Activity } from "../types";
 
 export const activityService = {
-  getActivities: async () => {
-    const response = await api.get<Activity[]>("/me/atividades");
-    return response.data;
-  },
-
-  getClassRooms: async () => {
-    const response = await api.get<{ id: number; name: string }[]>("/turmas/");
+  getActivities: async (params?: {
+    classroom?: number;
+    page?: number;
+    search?: string;
+  }) => {
+    const response = await api.get<PaginatedResponse<Activity>>(
+      "/me/atividades",
+      {
+        params,
+      },
+    );
     return response.data;
   },
 
@@ -22,5 +27,15 @@ export const activityService = {
     const response = await api.post<Activity>("/atividades/", payload);
     return response.data;
   },
-};
 
+  getActivitySubmissions: async (
+    activityId: number,
+    params?: { page?: number; search?: string },
+  ) => {
+    const response = await api.get<PaginatedResponse<any>>(
+      `/atividades/${activityId}/respostas/`,
+      { params },
+    );
+    return response.data;
+  },
+};

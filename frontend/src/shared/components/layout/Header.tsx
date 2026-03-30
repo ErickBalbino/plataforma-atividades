@@ -1,7 +1,8 @@
 import { authService } from "@/features/auth/services/authService";
-import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { UserOutlined } from "@ant-design/icons";
 import { useQueryClient } from "@tanstack/react-query";
-import { Avatar, Button, Layout, Space, Tag, Typography } from "antd";
+import { Avatar, Dropdown, Layout, MenuProps, Tag, Typography } from "antd";
+import { LogOutIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../../features/auth/hooks/useAuth";
 
@@ -24,6 +25,41 @@ export const Header = () => {
     }
   };
 
+  const menuItems: MenuProps["items"] = [
+    {
+      key: "profile-info",
+      label: (
+        <div className="flex flex-col py-2 px-1 min-w-[200px] cursor-default">
+          <Text strong className="text-gray-800 text-base">
+            {user?.name
+              ? user.name.split(" ").slice(0, 2).join(" ")
+              : user?.email?.split("@")[0]}
+          </Text>
+          <Text className="text-gray-500 text-sm mb-3">{user?.email}</Text>
+          <div>
+            <Tag
+              color={user?.role === "TEACHER" ? "blue" : "green"}
+              className="m-0 text-xs"
+            >
+              {user?.role === "TEACHER" ? "Professor" : "Aluno"}
+            </Tag>
+          </div>
+        </div>
+      ),
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "logout",
+      danger: true,
+      icon: <LogOutIcon size={18} />,
+      label: "Sair da plataforma",
+      onClick: handleLogout,
+      className: "py-2.5",
+    },
+  ];
+
   return (
     <AntHeader
       style={{
@@ -32,47 +68,27 @@ export const Header = () => {
         justifyContent: "space-between",
         background: "#fff",
         padding: "0 24px",
-        borderBottom: "1px solid #f0f0f0",
+        borderBottom: "1px solid #e5e7eb",
         height: 64,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        <Text strong style={{ fontSize: "1.2rem", color: "#1890ff" }}>
+        <Text strong style={{ fontSize: "1.2rem", color: "#000" }}>
           Plataforma de Atividades
         </Text>
       </div>
 
-      <Space size="large">
-        <Space>
-          <Avatar icon={<UserOutlined />} />
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              lineHeight: "1.2",
-            }}
-          >
-            <Text strong style={{ fontSize: "0.9rem" }}>
-              {user?.email}
-            </Text>
-            <Tag
-              color={user?.role === "TEACHER" ? "blue" : "green"}
-              style={{ margin: 0, fontSize: "0.7rem", width: "fit-content" }}
-            >
-              {user?.role === "TEACHER" ? "Professor" : "Aluno"}
-            </Tag>
-          </div>
-        </Space>
-
-        <Button
-          type="text"
-          icon={<LogoutOutlined />}
-          onClick={handleLogout}
-          style={{ color: "#ff4d4f" }}
-        >
-          Sair
-        </Button>
-      </Space>
+      <Dropdown
+        menu={{ items: menuItems }}
+        placement="bottomRight"
+        trigger={["click"]}
+      >
+        <Avatar
+          icon={<UserOutlined />}
+          size="large"
+          className="cursor-pointer bg-green-50 text-green-700 hover:bg-green-100 transition-colors border border-green-200"
+        />
+      </Dropdown>
     </AntHeader>
   );
 };

@@ -7,21 +7,14 @@ const { Content } = Layout;
 
 export const MainLayout = () => {
   return (
-    <Layout style={{ minHeight: "100vh", background: "#f5f5f5" }}>
+    <Layout className="min-h-screen bg-gray-50">
       <Sidebar />
-      <Layout>
+      <Layout className="transition-all duration-300">
         <Header />
-        <Content
-          style={{
-            margin: "24px",
-            padding: "24px",
-            background: "#fff",
-            borderRadius: "8px",
-            minHeight: 280,
-            boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
-          }}
-        >
-          <Outlet />
+        <Content className="m-6 p-6 bg-white rounded-2xl min-h-[280px] shadow-sm border border-gray-100 overflow-x-hidden">
+          <div className="max-w-7xl mx-auto">
+            <Outlet />
+          </div>
         </Content>
       </Layout>
     </Layout>

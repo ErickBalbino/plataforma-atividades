@@ -5,7 +5,7 @@ from .models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'role')
+        fields = ('id', 'username', 'email', 'name', 'role')
         read_only_fields = ('id',)
 
 class AuthenticatedUserSerializer(UserSerializer):
@@ -49,10 +49,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         name = validated_data.pop('name')
         password = validated_data.pop('password')
         
-        name_parts = name.strip().split(' ', 1)
-        first_name = name_parts[0]
-        last_name = name_parts[1] if len(name_parts) > 1 else ''
-
         username_base = validated_data['email'].split('@')[0]
         username = username_base
         counter = 1
@@ -65,7 +61,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             password=password,
             role=validated_data['role'],
-            first_name=first_name,
-            last_name=last_name
+            name=name
         )
         return user

@@ -1,11 +1,11 @@
 import { Layout, Typography } from "antd";
 import { Link } from "react-router-dom";
-import { LoginForm } from "../../features/auth/components/LoginForm";
+import { RegisterForm } from "../../features/auth/components/RegisterForm";
 
 const { Title, Text } = Typography;
 const { Content } = Layout;
 
-export function LoginPage() {
+export function RegisterPage() {
   return (
     <Layout className="min-h-screen bg-[#f8f8f8]">
       <Content className="flex items-center justify-center p-6">
@@ -22,26 +22,24 @@ export function LoginPage() {
                 className="!mb-2 !font-bold"
                 style={{ color: "#000" }}
               >
-                Bem-vindo de volta
+                Criar Conta
               </Title>
-              <Text type="secondary" className="text-base">
-                Acesse sua conta educacional
+              <Text type="secondary" className="text-base text-gray-700">
+                Junte-se à nossa Plataforma Educacional
               </Text>
             </div>
-            <LoginForm />
+            <RegisterForm />
           </div>
 
           <div className="text-center mt-6">
-            <Text className="text-sm text-gray-700">
-              Ainda não tem conta?{" "}
+            <Text className="text-sm font-medium text-gray-700">
+              Já tem uma conta?{" "}
               <Link
-                to="/cadastro"
+                to="/login"
                 className="!text-[#137333] !important font-medium hover:underline hover:text-[#0f9d58]"
               >
-                Criar uma agora
+                Faça login
               </Link>
-
-
             </Text>
           </div>
 

@@ -6,6 +6,7 @@ class User(AbstractUser):
         TEACHER = 'TEACHER', 'Professor'
         STUDENT = 'STUDENT', 'Aluno'
 
+    name = models.CharField(max_length=255, blank=True)
     email = models.EmailField(unique=True)
     role = models.CharField(
         max_length=10,

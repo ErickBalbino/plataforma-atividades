@@ -21,9 +21,10 @@ class Command(BaseCommand):
             username='professor',
             email='professor@email.com',
             password='123456',
-            role='TEACHER'
+            role='TEACHER',
+            name='Erick Balbino'
         )
-        self.stdout.write(self.style.SUCCESS('Usuário Professor criado: professor@email.com | 123456'))
+        self.stdout.write(self.style.SUCCESS('Usuário Professor criado: professor@email.com | 123456 (Erick Balbino)'))
 
         classroom_fullstack = ClassRoom.objects.create(
             name='Sala de Aula 01',
@@ -35,15 +36,17 @@ class Command(BaseCommand):
             username='aluno',
             email='aluno@email.com',
             password='123456',
-            role='STUDENT'
+            role='STUDENT',
+            name='João Silva'
         )
         student2 = User.objects.create_user(
             username='maria',
             email='maria@email.com',
             password='123456',
-            role='STUDENT'
+            role='STUDENT',
+            name='Maria Oliveira Santos'
         )
-        self.stdout.write(self.style.SUCCESS('Usuários Alunos criados: aluno@email.com | 123456'))
+        self.stdout.write(self.style.SUCCESS('Usuários Alunos criados: aluno@email.com | maria@email.com'))
 
         from apps.classes.models import ClassRoomMembership
         ClassRoomMembership.objects.create(classroom=classroom_fullstack, student=student1)

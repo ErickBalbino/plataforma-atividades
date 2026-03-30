@@ -1,5 +1,5 @@
 import api from "../../../shared/api/apiClient";
-import { AuthUser, LoginCredentials } from "../types";
+import { AuthUser, LoginCredentials, RegisterCredentials } from "../types";
 
 export const authService = {
   login: async (credentials: LoginCredentials) => {
@@ -8,6 +8,11 @@ export const authService = {
       access: string;
       refresh: string;
     }>("/auth/login/", credentials);
+    return response.data;
+  },
+
+  register: async (credentials: RegisterCredentials) => {
+    const response = await api.post<AuthUser>("/auth/register/", credentials);
     return response.data;
   },
 

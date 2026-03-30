@@ -2,7 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, DatePicker, Form, Input, Select } from "antd";
 import dayjs from "dayjs";
 import { Controller, useForm } from "react-hook-form";
-import { useCreateActivity, useClassrooms } from "../hooks/useActivities";
+import { useCreateActivity } from "../hooks/useActivities";
+import { useClassRooms } from "../../classes/hooks/useClassRooms";
 import { CreateActivityPayload, createActivitySchema } from "../schemas";
 
 const { TextArea } = Input;
@@ -10,7 +11,7 @@ const { Option } = Select;
 
 export const CreateActivityForm = () => {
   const { mutate, isPending } = useCreateActivity();
-  const { data: classrooms, isLoading: classroomsLoading } = useClassrooms();
+  const { data: classrooms, isLoading: classroomsLoading } = useClassRooms();
 
   const {
     control,
@@ -54,7 +55,7 @@ export const CreateActivityForm = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Form.Item
-          label="Turma"
+          label="Sala de Aula"
           validateStatus={errors.classroom ? "error" : ""}
           help={errors.classroom?.message}
         >
@@ -64,7 +65,7 @@ export const CreateActivityForm = () => {
             render={({ field }) => (
               <Select
                 {...field}
-                placeholder="Selecione a turma"
+                placeholder="Selecione a sala de aula"
                 size="large"
                 className="w-full"
                 loading={classroomsLoading}
