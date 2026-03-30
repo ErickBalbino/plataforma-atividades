@@ -6,156 +6,108 @@ Um sistema completo em padrão _monorepo_, arquitetado para entregar estabilidad
 
 ---
 
-## 🚀 Tecnologias Utilizadas
+## 🚀 1. Tecnologias Utilizadas
 
 ### Frontend
 
 - **Core:** React 18, TypeScript, Vite.
-- **Componentes e Estilização:** Ant Design (antd) + Tailwind CSS (para refinamentos em layout).
+- **UI & Estilização:** Ant Design (antd) + Tailwind CSS.
 - **Gestão de Estado/Cache:** TanStack Query (React Query).
-- **Roteamento:** React Router Dom v6.
 - **Formulários:** React Hook Form e Zod.
-- **Comunicação:** Axios.
+- **Navegação:** React Router Dom v6.
 
 ### Backend
 
 - **Core:** Python, Django, Django REST Framework (DRF).
 - **Banco de Dados:** PostgreSQL.
-- **Segurança:** Simple JWT (Cookies Auth).
-- **Utilitários:** django-environ, django-cors-headers.
+- **Segurança:** Simple JWT (Cookies HttpOnly).
+- **Mailing/CORS:** django-cors-headers, django-environ.
 
 ### Infraestrutura
 
-- **Orquestração:** Docker + Docker Compose.
+- **Containerização:** Docker & Docker Compose.
 
 ---
 
-## 🏛 Arquitetura
+## 🏛 2. Arquitetura e Regras de Negócio
 
-O sistema adota o padrão **Client-Server** tradicional, utilizando abordagens defensivas (_Zero Trust_) no backend e experiência otimista no frontend.
+O sistema aplica o padrão **Client-Server** com foco em regras de negócio rígidas e auditoria de acesso.
 
-- O **Backend** atua como guardião das regras de negócio, bloqueando modificações via custom permissions classes e interceptadores nas serializações do DRF.
-- O **Frontend** reflete de forma simples o contrato imposto, sem carregar "regras mágicas": as renderizações condicionais dependem puramente da tipagem de retorno. A gestão de estado foi feita com o **TanStack Query**, removendo a necessidade de middlewares gigantes como Redux.
-
----
-
-## 📋 Regras de Negócio Implementadas
-
-1. **Gestão do Professor:** Apenas o professor pode emitir atividades (obrigatoriamente atribuídas pelo `POST /atividades/`).
-2. **Visibilidade Direcional:** Um aluno só acessa e lista atividades inerentes à sua própria Turma. Professores listam e visualizam as atividades por eles publicadas.
-3. **Submissão Única:** O aluno responde uma única vez por atividade usando o _POST_. Ele tem liberdade para editar (_PATCH_) sua resposta até o instante limite final (`due_date`).
-4. **Vencimento do Prazo:** O término do prazo cristaliza o conteúdo, impedindo que os alunos injetem ou atualizem dados e autorizando o professor a emitir uma nota decisiva.
-5. **Correção Fechada:** Apenas o professor criador daquela atividade pode avaliá-la, lançando **Nota (entre 0 e 10)** e **Feedback** com as exigências técnicas impostas pelo campo numérico.
+- **Fluxo do Professor:** Cria salas de aula e atividades. Somente o criador da atividade pode visualizar, corrigir e atribuir notas aos seus alunos.
+- **Fluxo do Aluno:** Entra em salas via código, visualiza tarefas pendentes e submete respostas. O conteúdo é "congelado" após o prazo ou após a atribuição de nota.
+- **Validação de Nota:** Restrição técnica para notas entre **0 e 10**, garantindo consistência estatística.
 
 ---
 
-## 🗂 Estrutura do Projeto (Monorepo)
+## 🛠 3. Como Rodar o Projeto (Passo a Passo)
 
-O projeto encontra-se particionado em três vértices principais de desenvolvimento:
+O ambiente foi Dockerizado nativamente, isolando o sistema host. Siga as etapas abaixo para subir o monorepo.
+
+### Pré-requisitos
+
+- [Docker](https://docs.docker.com/get-docker/) instalado.
+- [Docker Compose](https://docs.docker.com/compose/install/) (geralmente incluso no Docker Desktop).
+
+### Execução
+
+1.  **Clone o repositório** e entre na pasta raiz.
+2.  **Suba os containers** (Frontend, Backend e DB):
+    ```bash
+    docker compose up -d --build
+    ```
+3.  **Execute as migrações** do banco de dados:
+    ```bash
+    docker compose exec backend python manage.py migrate
+    ```
+4.  **Popule o banco (Seed)** com dados de teste (Professores, Alunos e Salas):
+    ```bash
+    docker compose exec backend python manage.py seed
+    ```
+5.  **Acesse o sistema**:
+    - Frontend: `http://localhost:5173`
+    - Backend API: `http://localhost:8000/api/`
+
+---
+
+## 💡 4. Detalhes Técnicos e Decisões de Design
+
+- **Segurança e Isolamento de Credenciais (JWT via Cookies HttpOnly)**: Diferente da abordagem comum (e menos segura) de armazenar tokens no `localStorage`, este projeto utiliza cookies segregados com a flag `HttpOnly`. Isso garante que o token JWT não seja acessível via scripts no frontend, mitigando drasticamente vetores de ataque XSS (Cross-Site Scripting). O backend Django também está preparado para validação rigorosa de `CORS` e `CSRF`.
+- **Estabilidade de Interface e Persistência de Contexto (Busca Ininterrupta)**: Implementamos uma lógica de renderização onde o componente de `Input` de busca é desacoplado dos estados de carregamento (`Spin/Loading`). Isso evita que o campo de busca suma ou perca o foco durante a sincronização de dados com o servidor, proporcionando uma experiência de usuário fluida e profissional.
+- **Otimização de Performance com Debouncing**: Para evitar sobrecarga no backend e chamadas de API desnecessárias a cada tecla digitada, as pesquisas em tempo real utilizam um sistema de `Debounce` customizado (500ms). Isso garante que o servidor só seja consultado quando o usuário termina uma intenção de busca.
+- **Integridade de Dados e Bloqueio de Estados (Imutabilidade Pós-Correção)**: O sistema impõe uma regra de imutabilidade na submissão do aluno assim que uma nota é atribuída pelo professor. Essa decisão de design garante a integridade histórica dos dados acadêmicos, impedindo alterações de conteúdo após a auditoria/correção ter sido realizada.
+
+
+---
+
+## 🗂 5. Estrutura de Arquivos
 
 ```
 \
-├── backend/                  # Ambiente server-side gerido por Django
-│   ├── apps/                 # Lógica separada por domínios clássicos
-│   │   ├── accounts/         # (Autenticação e Perfis)
-│   │   ├── classes/          # (Gestão de Salas)
-│   │   ├── activities/       # (Geração de Tarefas)
-│   │   └── submissions/      # (Respostas e Correções)
-│   ├── config/               # Settings isolados (base/dev)
-│   └── requirements.txt
+├── backend/                  # Django Framework
+│   ├── apps/                 # Domínios de negócio isolados
+│   │   ├── accounts/         # Perfil e Autenticação
+│   │   ├── classes/          # Gestão de Turmas
+│   │   ├── activities/       # Criação de Tarefas
+│   │   └── submissions/      # Respostas e Notas
+│   ├── config/               # Configurações globais
+│   └── requirements.txt      # Dependências Python
 │
-├── frontend/                 # Client React
+├── frontend/                 # React Framework
 │   ├── src/
-│   │   ├── features/         # Clean Architecture (agrupamento vertical por módulo)
-│   │   │   ├── auth/
-│   │   │   ├── activities/
-│   │   │   └── submissions/
-│   │   ├── pages/            # View Containers com chamadas de UI limpa
-│   │   └── shared/           # Cross-components (Header, Layout, Axios Client)
+│   │   ├── features/         # Lógica modularizada (Feature-Sliced Design)
+│   │   ├── pages/            # Views (Páginas principais)
+│   │   └── shared/           # Hooks, Componentes e API base reutilizáveis
 │
-└── docker-compose.yml        # Ligações vitais do sistema (Frontend, Backend, DB)
+└── docker-compose.yml        # Orquestração do Monorepo
 ```
 
 ---
 
-## 📡 Endpoints Principais
+## 🚀 6. Melhorias Futuras
 
-A abstração da Rest API foi documentada internamente, utilizando nomenclatura padronizada e simplificada (foco no idioma alvo estipulado nos requisitos):
+Embora o sistema seja funcional e estável, identificamos os seguintes pontos de evolução:
 
-- **Auth**:
-  - `POST /auth/login/` → Emite os tokens (Session e Refresh).
-  - `POST /auth/logout/` → Encerra sessão.
-  - `GET /auth/me/` → Retorna o perfil ativo.
-
-- **Atividades**:
-  - `POST /atividades/` → Cria uma nova atribuição (Apenas Professor).
-  - `GET /me/atividades/` → Lista as atribuições correlacionadas ao perfil atual do usuário.
-
-- **Submissões (Respostas)**:
-  - `POST /respostas/` → Submete uma solução (Apenas Aluno).
-  - `PATCH /respostas/{id}/` → Fork arquitetural duplo:
-    - Se acionado por Aluno → Permite alteração do texto da submissão (Antes do expirar do prazo).
-    - Se acionado por Professor → Lanço da avaliação (Nota/Feedback).
-  - `GET /me/respostas/` → Lista de envio pendentes do próprio aluno ou as pendentes de correção do professor logado.
-
----
-
-## 💡 Decisões Técnicas
-
-- **Autenticação via Cookies `HttpOnly`**: Optamos por não utilizar o `localStorage` do browser em prol de uma maior segurança arquitetural contra roubo de tokens maliciosos, armazenando o JWT e o Refresh na camada segura gerida pelo navegador do lado do Django.
-- **TanStack Query & Invalidação de Cache Silenciosa**: Interceptar requisições lentas via Loading Spinners tornou a performance do projeto espetacular. Com a invalidação dos caches, ações contínuas (como as "Correções") geram um sentimento de sistema leve — avaliou um Aluno, ele flui automaticamente para a próxima card via React.
-- **Divisão de Rotas em Idiomas (Backend vs Frontend)**: Uma escolha para abraçar o desenvolvedor que trabalha focado. Os schemas internos e códigos fontes se baseiam no padrão global (Inglês: _Activities, Submissions, Views_), porém toda rota REST e roteamento público do client se comunicam no padrão da documentação exigida (Português: `POST /respostas/`, rotas `/correcoes`).
-- **Design Pattern _"Feature Sliced"_ no Cliente**: Em vez do obsoleto agrupamento horizontal (ex: ter pastas gigantes só de hooks, todas as interfaces juntas), modularizamos features verticais independentes, elevando exponencialmente a escalabilidade do frontend.
-
----
-
-## 🛠 Instruções de Execução Rápida
-
-O ambiente foi Dockerizado nativamente, isolando você da necessidade de bibliotecas conflitantes. Tudo está "Plug and Play".
-
-1. Garanta ter o [Docker](https://docs.docker.com/) e o `docker compose` instalados na sua máquina.
-2. Na pasta raiz do monorepo, suba todos os containers com a flag gerencial:
-
-   ```bash
-   docker compose up -d --build
-   ```
-
-3. Instale o schema no banco de dados e os dados de iniciação:
-
-   ```bash
-   docker compose exec backend python manage.py makemigrations
-   docker compose exec backend python manage.py migrate
-   ```
-
-4. Acesse:
-   - Frontend web ativo: `http://localhost:5173`
-   - Backend gerencial REST: `http://localhost:8000/`
-
----
-
-## 🧪 Credenciais e Dados de Teste (Seed)
-
-Para facilitar a avaliação do sistema sem a necessidade de cadastros manuais, foi construído um comando que popula o banco com um cenário inicial (Usuários, Turmas, Atividades e Submissões):
-
-Execute na pasta raiz:
-
-```bash
-docker compose exec backend python manage.py seed
-```
-
-Após o sucesso, faça login com os usuários abaixo:
-
-### 🎓 Perfil Professor
-
-Pode criar atividades na "Turma 01" e corrigir envios:
-
-- **E-mail:** `professor@email.com`
-- **Senha:** `123456`
-
-### 📚 Perfil Aluno (1 e 2)
-
-Podem acessar as tarefas da sua turma e submeter resoluções:
-
-- **E-mail 1:** `aluno@email.com`
-- **E-mail 2:** `maria@email.com`
-- **Senha:** `123456` (para ambos)
+1.  **Testes Automatizados**: Implementação de testes unitários no backend (Pytest) e E2E no frontend (Cypress/Playwright).
+2.  **Dashboard Analytics**: Visualização gráfica do progresso das turmas e média de notas de atividades.
+3.  **Notificações em Tempo Real**: Uso de WebSockets (Django Channels) para avisar o aluno quando uma nota for atribuída.
+4.  **Anexos de Arquivos**: Permitir que alunos façam upload de PDFs ou imagens em suas respostas via AWS S3 ou similar.
